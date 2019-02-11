@@ -25,12 +25,19 @@ struct Matrix {
     inline int __attribute__((always_inline)) rows() const;
     inline void __attribute__((always_inline)) zeros();
     void identity();
+
+    void mulMM(const Matrix<TYPE, COLS, ROWS>& m);
     template<int COLS_B>
-    void mulMM(Matrix<TYPE, COLS_B, ROWS>& ret, const Matrix<TYPE, COLS_B, COLS>& m) const;
+    void mulMM(const Matrix<TYPE, COLS_B, COLS>& m, Matrix<TYPE, COLS_B, ROWS>& ret) const;
+
+    void transpose();
     void transpose(Matrix<TYPE, ROWS, COLS>& ret);
-    bool inverse(Matrix<TYPE, COLS, ROWS>& inv_mat);
+
+    bool inverse();
+    bool inverse(Matrix<TYPE, COLS, ROWS>& ret);
+
     void disp() const;
-    void cofNNMatrix(Matrix<TYPE, COLS-1, ROWS-1>& ret, int x, int y) const;
+    void cofNNMatrix(int x, int y, Matrix<TYPE, COLS-1, ROWS-1>& ret) const;
     TYPE cofactor() const;
     const Matrix<TYPE, COLS, ROWS>& operator *= (float k);
 };
@@ -94,8 +101,7 @@ inline int __attribute__((always_inline)) Matrix<TYPE, COLS, ROWS>::rows() const
  */
 template<typename TYPE, int COLS, int ROWS>
 inline void __attribute__((always_inline)) Matrix<TYPE, COLS, ROWS>::zeros() {
-    constexpr size_t SIZE = sizeof(TYPE) * COLS * ROWS;
-    memset(values, 0, SIZE);
+    memset(values, 0, sizeof(values));
 }
 
 /**
@@ -116,8 +122,29 @@ void Matrix<TYPE, COLS, ROWS>::identity() {
  * this<TYPE, S, R1> * m<TYPE, C2, S> = ret<TYPE, C2, R1>
  */
 template<typename TYPE, int COLS, int ROWS>
+void Matrix<TYPE, COLS, ROWS>::mulMM(const Matrix<TYPE, COLS, ROWS>& m) {
+    const int COLS_ROWS = COLS;
+
+    Matrix<TYPE, COLS, ROWS> src(*this);
+    zeros();
+
+    for (int i = 0; i < ROWS; i++) {
+        for (int k = 0; k < COLS_ROWS; k++) {
+            for (int j = 0; j < COLS; j++) {
+                values[i][j] += src.values[i][k] * m.values[k][j];
+            }
+        }
+    }
+}
+
+/**
+ * 行列同士の乗算を行う
+ * 返却される行列(ret)の大きさは乗算し合う行列の行と列を組み合わせたものとなる。
+ * this<TYPE, S, R1> * m<TYPE, C2, S> = ret<TYPE, C2, R1>
+ */
+template<typename TYPE, int COLS, int ROWS>
 template<int COLS_B>
-void Matrix<TYPE, COLS, ROWS>::mulMM(Matrix<TYPE, COLS_B, ROWS>& ret, const Matrix<TYPE, COLS_B, COLS>& m) const {
+void Matrix<TYPE, COLS, ROWS>::mulMM(const Matrix<TYPE, COLS_B, COLS>& m, Matrix<TYPE, COLS_B, ROWS>& ret) const {
     const int COLS_ROWS_B = COLS;
     
     ret.zeros();
@@ -132,6 +159,19 @@ void Matrix<TYPE, COLS, ROWS>::mulMM(Matrix<TYPE, COLS_B, ROWS>& ret, const Matr
 }
 
 /**
+ * 転置行列に置き換える
+ */
+template<typename TYPE, int COLS, int ROWS>
+void Matrix<TYPE, COLS, ROWS>::transpose() {
+    Matrix<TYPE, COLS, ROWS> src(*this);
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLS; j++) {
+            values[j][i] = src.values[i][j];
+        }
+    }
+}
+
+/**
  * 転置行列の返却
  */
 template<typename TYPE, int COLS, int ROWS>
@@ -141,6 +181,16 @@ void Matrix<TYPE, COLS, ROWS>::transpose(Matrix<TYPE, ROWS, COLS>& ret) {
             ret.values[j][i] = values[i][j];
         }
     }
+}
+
+/**
+ * 逆行列を求め置き換える
+ * @return 逆行列が存在しない場合はfalse, 存在する場合はtrue
+ */
+template<typename TYPE, int COLS, int ROWS>
+bool Matrix<TYPE, COLS, ROWS>::inverse() {
+    Matrix<TYPE, COLS, ROWS> src(*this);
+    return src.inverse(*this);
 }
 
 /**
@@ -159,7 +209,7 @@ bool Matrix<TYPE, COLS, ROWS>::inverse(Matrix<TYPE, COLS, ROWS>& inv_mat) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             // 余因子行列の取得
-            cofNNMatrix(cofnnm, j, i);
+            cofNNMatrix(j, i, cofnnm);
             
             // 符号の割り当て
             if (((i + j) % 2) == 0) {
@@ -198,7 +248,7 @@ void Matrix<TYPE, COLS, ROWS>::disp() const {
  * 余因子行列を返却する
  */
 template<typename TYPE, int COLS, int ROWS>
-void Matrix<TYPE, COLS, ROWS>::cofNNMatrix(Matrix<TYPE, COLS-1, ROWS-1>& ret, int x, int y) const {
+void Matrix<TYPE, COLS, ROWS>::cofNNMatrix(int x, int y, Matrix<TYPE, COLS-1, ROWS-1>& ret) const {
     for (int i = 0, ii = 0; i < ret.rows(); i++, ii++) {
         if (ii == y) {
             ii++;
