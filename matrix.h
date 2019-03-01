@@ -206,11 +206,11 @@ bool Matrix<TYPE, COLS, ROWS>::inverse(Matrix<TYPE, COLS, ROWS>& inv_mat) {
     }
     
     Matrix<TYPE, COLS-1, ROWS-1> cofnnm;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < COLS; i++) {
+        for (int j = 0; j < ROWS; j++) {
             // 余因子行列の取得
             cofNNMatrix(j, i, cofnnm);
-            
+
             // 符号の割り当て
             if (((i + j) % 2) == 0) {
                 // 偶数の場合
