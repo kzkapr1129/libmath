@@ -60,6 +60,7 @@ public:
 };
 
 typedef Vector<float, 3> Vector3f;
+typedef Vector<float, 4> Vector4f;
 typedef Vector<uint8_t, 3> Vector3b;
 
 /**

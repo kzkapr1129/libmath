@@ -42,6 +42,9 @@ struct Matrix {
     const Matrix<TYPE, COLS, ROWS>& operator *= (float k);
 };
 
+typedef Matrix<float, 4, 4> Matrix4f;
+typedef Matrix<float, 3, 3> Matrix3f;
+
 /**
  * デフォルトコンストラクタ
  */

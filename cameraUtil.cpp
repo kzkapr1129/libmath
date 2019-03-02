@@ -1,7 +1,7 @@
 #include "cameraUtil.h"
 
 void CameraUtil::genInnerParam(float focalLength, float kx, float ky,
-		int imgWidth, int imgHeight, Matrix<float, 4, 4>& dst) {
+		int imgWidth, int imgHeight, Matrix4f& dst) {
 
 	dst.values[0][0] = focalLength * kx;  // FKx
 	dst.values[0][1] = 0;
@@ -25,7 +25,7 @@ void CameraUtil::genInnerParam(float focalLength, float kx, float ky,
 }
 
 void CameraUtil::genOuterParamXAxis(float radian,
-		const Vector<float, 4>& t, Matrix<float, 4, 4>& dst) {
+		const Vector4f& t, Matrix4f& dst) {
 	dst.values[0][0] = 1;
 	dst.values[0][1] = 0;
 	dst.values[0][2] = 0;
@@ -48,7 +48,7 @@ void CameraUtil::genOuterParamXAxis(float radian,
 }
 
 void CameraUtil::genOuterParamYAxis(float radian,
-		const Vector<float, 4>& t, Matrix<float, 4, 4>& dst) {
+		const Vector4f& t, Matrix4f& dst) {
 	dst.values[0][0] = cosf(radian);
 	dst.values[0][1] = 0;
 	dst.values[0][2] = sinf(radian);
@@ -71,7 +71,7 @@ void CameraUtil::genOuterParamYAxis(float radian,
 }
 
 void CameraUtil::genOuterParamZAxis(float radian,
-		const Vector<float, 4>& t, Matrix<float, 4, 4>& dst) {
+		const Vector4f& t, Matrix4f& dst) {
 	dst.values[0][0] = cosf(radian);
 	dst.values[0][1] = -sinf(radian);
 	dst.values[0][2] = 0;
@@ -93,10 +93,10 @@ void CameraUtil::genOuterParamZAxis(float radian,
 	dst.values[3][3] = t.values[3];
 }
 
-void CameraUtil::genImagePos(const Matrix<float, 4, 4>& innerParam,
-			const Matrix<float, 4, 4>& outerParam,
-			const Vector<float, 3>& worldPos,
-			Vector<float, 3>& imgPos) {
+void CameraUtil::genImagePos(const Matrix4f& innerParam,
+			const Matrix4f& outerParam,
+			const Vector3f& worldPos,
+			Vector3f& imgPos) {
 
 	// カメラ座標 = 外部パラメータ * ワールド座表
 	Vector<float, 4> cameraPos = {
@@ -114,10 +114,10 @@ void CameraUtil::genImagePos(const Matrix<float, 4, 4>& innerParam,
 	imgPos.values[1] = imagePos.values[1] / imagePos.values[2];
 }
 
-bool CameraUtil::genWorldPos(const Matrix<float, 4, 4>& innerParam,
-			const Matrix<float, 4, 4>& outerParam,
-			const Vector<float, 3>& imgPos,
-			Vector<float, 3>& worldPos) {
+bool CameraUtil::genWorldPos(const Matrix4f& innerParam,
+			const Matrix4f& outerParam,
+			const Vector3f& imgPos,
+			Vector3f& worldPos) {
 
 	Vector<float, 4> projPos = {
 		imgPos.values[0] * imgPos.values[2],
