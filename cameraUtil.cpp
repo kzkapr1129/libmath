@@ -1,16 +1,17 @@
 #include "cameraUtil.h"
 
+// focalLength, width, heightについては「genInnerParam_tool.xlsx」参照
 void CameraUtil::genInnerParam(float focalLength, float kx, float ky,
-		int imgWidth, int imgHeight, Matrix4f& dst) {
+		float width, float height, Matrix4f& dst) {
 
 	dst.values[0][0] = focalLength * kx;  // FKx
 	dst.values[0][1] = 0;
-	dst.values[0][2] = imgWidth / 2.f;    // cx
+	dst.values[0][2] = width / 2.f;    // cx
 	dst.values[0][3] = 0;
 
 	dst.values[1][0] = 0;
 	dst.values[1][1] = -focalLength * ky; // FKy
-	dst.values[1][2] = imgHeight / 2.f;   // cy
+	dst.values[1][2] = height / 2.f;   // cy
 	dst.values[1][3] = 0;
 
 	dst.values[2][0] = 0;
