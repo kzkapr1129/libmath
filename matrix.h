@@ -34,7 +34,7 @@ struct Matrix {
     void transpose(Matrix<TYPE, ROWS, COLS>& ret);
 
     bool inverse();
-    bool inverse(Matrix<TYPE, COLS, ROWS>& ret);
+    bool inverse(Matrix<TYPE, COLS, ROWS>& ret) const;
 
     void disp() const;
     void cofNNMatrix(int x, int y, Matrix<TYPE, COLS-1, ROWS-1>& ret) const;
@@ -201,7 +201,7 @@ bool Matrix<TYPE, COLS, ROWS>::inverse() {
  * @return 逆行列が存在しない場合はfalse, 存在する場合はtrue
  */
 template<typename TYPE, int COLS, int ROWS>
-bool Matrix<TYPE, COLS, ROWS>::inverse(Matrix<TYPE, COLS, ROWS>& inv_mat) {
+bool Matrix<TYPE, COLS, ROWS>::inverse(Matrix<TYPE, COLS, ROWS>& inv_mat) const {
     const float cof = cofactor();
     if (cof == 0 || COLS != ROWS) {
         // 逆行列が存在しない場合
