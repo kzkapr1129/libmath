@@ -346,7 +346,7 @@ void Vector<TYPE, LEN>::cross(const Vector<TYPE, LEN>& v, Vector<TYPE, LEN>& ret
     TYPE v0 = values[1] * v.values[2] - values[2] * v.values[1];
 
     // v1 = a0b2 - a2b0
-    TYPE v1 = values[0] * v.values[2] - values[2] * v.values[0];
+    TYPE v1 = -values[0] * v.values[2] + values[2] * v.values[0];
 
     // v2 = a0b1 - a1b0
     TYPE v2 = values[0] * v.values[1] - values[1] * v.values[0];
